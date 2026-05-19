@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LembraMe">
+<meta name="theme-color" content="#E8E4DC">
+<title>LembraMe by Bruno Cabral</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #E8E4DC;
+    --card-1: #C5CBB8;
+    --card-2: #D4A97A;
+    --card-3: #E05C3A;
+    --card-4: #7A9E8E;
+    --card-5: #D9C87A;
+    --card-6: #5C7A6E;
+    --text: #1A1A1A;
+    --text-light: #555;
+    --white: #fff;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 100px;
+  }
+
+  header {
+    padding: 56px 24px 28px;
+    background: var(--bg);
+  }
+  header .label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+  header h1 span {
+    color: var(--text-light);
+    font-weight: 400;
+    font-size: 1rem;
+    display: block;
+    letter-spacing: 0;
+    margin-top: 4px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px 20px;
+  }
+  .tab {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1.5px solid #1A1A1A;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text);
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  .section-label {
+    padding: 0 24px 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  /* Stacked cards */
+  .card-stack { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    border-radius: 18px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+  .card:nth-child(6n+1) { background: var(--card-1); }
+  .card:nth-child(6n+2) { background: var(--card-2); }
+  .card:nth-child(6n+3) { background: var(--card-3); color: var(--white); }
+  .card:nth-child(6n+4) { background: var(--card-4); color: var(--white); }
+  .card:nth-child(6n+5) { background: var(--card-5); }
+  .card:nth-child(6n+6) { background: var(--card-6); color: var(--white); }
+  .card.done { filter: grayscale(0.5); opacity: 0.65; }
+
+  .card-left { flex: 1; }
+  .card-cat {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-bottom: 5px;
+  }
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .card-sub {
+    font-size: 0.72rem;
+    opacity: 0.6;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+
+  .card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .card-days {
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .card-days-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-align: right;
+  }
+  .card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%; border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.12);
+    color: inherit;
+    transition: transform 0.15s;
+  }
+  .icon-btn:active { transform: scale(0.88); }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(0,0,0,0.25);
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .status-dot.urgent { background: #FF3B30; }
+  .status-dot.soon { background: #FF9500; }
+  .status-dot.ok { background: #30D158; }
+
+  .empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* FAB */
+  .fab {
+    position: fixed; bottom: 28px; right: 24px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--text); color: var(--bg);
+    border: none; font-size: 1.6rem; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 100; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+    font-weight: 300;
+  }
+  .fab:active { transform: scale(0.92); }
+
+  /* Modal */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--bg); border-radius: 28px 28px 0 0;
+    padding: 32px 24px 48px; width: 100%; max-width: 520px;
+    animation: slideUp 0.3s ease;
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .modal-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: rgba(0,0,0,0.15); margin: 0 auto 24px;
+  }
+  .modal h2 {
+    font-size: 1.4rem; font-weight: 800; margin-bottom: 24px;
+    letter-spacing: -0.5px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.65rem; font-weight: 700;
+    color: var(--text-light); margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  input, select {
+    width: 100%; padding: 14px 16px;
+    border: none; border-radius: 14px;
+    font-size: 1rem; color: var(--text);
+    background: rgba(0,0,0,0.07);
+    margin-bottom: 16px; outline: none;
+    font-family: inherit; font-weight: 600;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus { background: rgba(0,0,0,0.11); }
+
+  .row { display: flex; gap: 10px; }
+  .row > div { flex: 1; }
+
+  .quick-btns { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+  .quick-btn {
+    padding: 8px 14px; border-radius: 20px;
+    border: 1.5px solid rgba(0,0,0,0.2);
+    background: transparent; color: var(--text);
+    font-size: 0.78rem; cursor: pointer; font-weight: 700;
+    transition: all 0.15s;
+  }
+  .quick-btn.sel, .quick-btn:active {
+    background: var(--text); color: var(--bg); border-color: var(--text);
+  }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 8px; }
+  .btn {
+    flex: 1; padding: 16px; border-radius: 16px; border: none;
+    font-size: 1rem; font-weight: 800; cursor: pointer;
+    letter-spacing: -0.2px; transition: opacity 0.15s;
+  }
+  .btn:active { opacity: 0.75; }
+  .btn-primary { background: var(--text); color: var(--bg); }
+  .btn-cancel { background: rgba(0,0,0,0.08); color: var(--text-light); }
+
+  .notif-banner {
+    margin: 0 16px 12px; padding: 14px 18px; border-radius: 16px;
+    background: rgba(0,0,0,0.06);
+    font-size: 0.82rem; color: var(--text-light); display: none;
+  }
+  .notif-banner.show { display: block; }
+  .notif-banner b { display: block; margin-bottom: 4px; color: var(--text); font-size: 0.85rem; }
+  .notif-banner button {
+    margin-top: 8px; background: var(--text); color: var(--bg);
+    border: none; padding: 8px 16px; border-radius: 10px;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Lembretes pessoais</div>
+  <h1>LembraMe<span>by Bruno Cabral</span></h1>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="filterTab('pendentes',this)">Pendentes</button>
+  <button class="tab" onclick="filterTab('concluidos',this)">Concluídos</button>
+</div>
+
+<div id="notifBanner" class="notif-banner">
+  <b>Notificações desativadas</b>
+  Ativa para receberes alertas no prazo.
+  <button onclick="requestNotif()">Ativar</button>
+</div>
+
+<div class="section-label" id="sectionLabel">A decorrer</div>
+<div class="card-stack" id="list"></div>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="modal-bg" id="modalBg" onclick="closeIfOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Novo lembrete</h2>
+
+    <label>Descrição</label>
+    <input type="text" id="f-title" placeholder="Ex: Regar as plantas" maxlength="60">
+
+    <label>Data de início</label>
+    <input type="date" id="f-start">
+
+    <label>Notificar daqui a</label>
+    <div class="quick-btns" id="quickBtns">
+      <button class="quick-btn" onclick="setQuick(1,this)">1 dia</button>
+      <button class="quick-btn" onclick="setQuick(2,this)">2 dias</button>
+      <button class="quick-btn" onclick="setQuick(3,this)">3 dias</button>
+      <button class="quick-btn" onclick="setQuick(7,this)">7 dias</button>
+      <button class="quick-btn" onclick="setQuick(12,this)">12 dias</button>
+      <button class="quick-btn" onclick="setQuick(30,this)">1 mês</button>
+      <button class="quick-btn" onclick="setQuick(60,this)">2 meses</button>
+      <button class="quick-btn" onclick="setQuick(90,this)">3 meses</button>
+      <button class="quick-btn" onclick="setQuick(180,this)">6 meses</button>
+      <button class="quick-btn" onclick="setQuick(365,this)">1 ano</button>
+      <button class="quick-btn" onclick="setQuick(730,this)">2 anos</button>
+      <button class="quick-btn" onclick="setQuick(1095,this)">3 anos</button>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Ou inserir dias</label>
+        <input type="number" id="f-days" placeholder="Ex: 20" min="1" oninput="clearQuick()">
+      </div>
+      <div>
+        <label>Data alvo</label>
+        <input type="date" id="f-target" oninput="calcDaysFromTarget()">
+      </div>
+    </div>
+
+    <label>Repetição</label>
+    <select id="f-repeat">
+      <option value="none">Uma vez</option>
+      <option value="repeat">Repetir até confirmar</option>
+    </select>
+
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveReminder()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let reminders = JSON.parse(localStorage.getItem('lembraMe') || '[]');
+let currentFilter = 'pendentes';
+
+function save() { localStorage.setItem('lembraMe', JSON.stringify(reminders)); }
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function diffDays(target) {
+  return Math.round((new Date(target) - new Date(today())) / 86400000);
+}
+
+function fmtDate(d) {
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function openModal() {
+  document.getElementById('f-start').value = today();
+  document.getElementById('f-days').value = '';
+  document.getElementById('f-target').value = '';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-repeat').value = 'none';
+  clearQuick();
+  document.getElementById('modalBg').classList.add('open');
+}
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+function closeIfOutside(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
+
+function setQuick(days, btn) {
+  document.getElementById('f-days').value = days;
+  const start = document.getElementById('f-start').value || today();
+  document.getElementById('f-target').value = addDays(start, days);
+  document.querySelectorAll('#quickBtns .quick-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function clearQuick() {
+  document.querySelectorAll('#quickBtns .quick-btn').forEach(b => b.classList.remove('sel'));
+  const days = parseInt(document.getElementById('f-days').value);
+  if (days > 0) {
+    const start = document.getElementById('f-start').value || today();
+    document.getElementById('f-target').value = addDays(start, days);
+  }
+}
+function calcDaysFromTarget() {
+  const t = document.getElementById('f-target').value;
+  const s = document.getElementById('f-start').value || today();
+  if (t && s) {
+    const diff = Math.round((new Date(t) - new Date(s)) / 86400000);
+    if (diff > 0) { document.getElementById('f-days').value = diff; clearQuick(); }
+  }
+}
+
+function saveReminder() {
+  const title = document.getElementById('f-title').value.trim();
+  const start = document.getElementById('f-start').value || today();
+  const days = parseInt(document.getElementById('f-days').value);
+  const repeat = document.getElementById('f-repeat').value;
+
+  if (!title) { alert('Por favor insere uma descrição.'); return; }
+  if (!days || days < 1) { alert('Define o prazo.'); return; }
+
+  const target = addDays(start, days);
+  const id = Date.now();
+  reminders.push({ id, title, start, target, days, repeat, done: false });
+  save(); scheduleNotif(reminders[reminders.length-1]); render(); closeModal();
+}
+
+function formatDaysLabel(diff) {
+  if (diff < 0) return { val: Math.abs(diff) + 'd', label: 'em atraso', status: 'urgent' };
+  if (diff === 0) return { val: 'Hoje', label: '', status: 'urgent' };
+  if (diff <= 7) return { val: diff + 'd', label: 'restantes', status: 'soon' };
+  if (diff < 30) return { val: diff + 'd', label: 'restantes', status: 'ok' };
+  if (diff < 365) return { val: Math.round(diff/30) + 'm', label: 'restantes', status: 'ok' };
+  return { val: (diff/365).toFixed(1).replace('.0','') + 'a', label: 'restantes', status: 'ok' };
+}
+
+function render() {
+  const list = document.getElementById('list');
+  const lbl = document.getElementById('sectionLabel');
+  let filtered = currentFilter === 'pendentes'
+    ? reminders.filter(r => !r.done)
+    : reminders.filter(r => r.done);
+
+  filtered.sort((a,b) => a.target.localeCompare(b.target));
+  lbl.textContent = currentFilter === 'pendentes' ? `${filtered.length} pendente${filtered.length!==1?'s':''}` : `${filtered.length} concluído${filtered.length!==1?'s':''}`;
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty">${currentFilter==='pendentes'?'Sem lembretes pendentes.<br>Toca em + para adicionar.':'Ainda não concluíste nenhum.'}</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(r => {
+    const diff = diffDays(r.target);
+    const { val, label, status } = formatDaysLabel(diff);
+    const repLabel = r.repeat === 'repeat' ? ' · Repete' : '';
+    return `
+    <div class="card ${r.done?'done':''}">
+      <div class="card-left">
+        <div class="card-cat"><span class="status-dot ${r.done?'':''+status}"></span>${fmtDate(r.target)}${repLabel}</div>
+        <div class="card-title">${r.title}</div>
+        <div class="card-sub">Iniciado em ${fmtDate(r.start)}</div>
+      </div>
+      <div class="card-right">
+        <div>
+          <div class="card-days">${r.done ? '--' : val}</div>
+          <div class="card-days-label">${r.done ? 'feito' : label}</div>
+        </div>
+        <div class="card-actions">
+          ${!r.done
+            ? `<button class="icon-btn" onclick="markDone(${r.id})" title="Concluído">✓</button>`
+            : `<button class="icon-btn" onclick="reopen(${r.id})" title="Reabrir">↩</button>`}
+          <button class="icon-btn" onclick="deleteR(${r.id})" title="Apagar">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function markDone(id) {
+  const r = reminders.find(x => x.id === id);
+  if (!r) return;
+  r.done = true;
+  if (r.repeat === 'repeat') {
+    const newTarget = addDays(r.target, r.days);
+    reminders.push({...r, id: Date.now(), done: false, start: r.target, target: newTarget});
+  }
+  save(); render();
+}
+function reopen(id) {
+  const r = reminders.find(x => x.id === id);
+  if (r) { r.done = false; save(); render(); }
+}
+function deleteR(id) {
+  if (!confirm('Apagar este lembrete?')) return;
+  reminders = reminders.filter(x => x.id !== id);
+  save(); render();
+}
+
+function filterTab(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+async function requestNotif() {
+  if (!('Notification' in window)) return;
+  await Notification.requestPermission();
+  checkNotifBanner();
+  scheduleAllNotifs();
+}
+function checkNotifBanner() {
+  const b = document.getElementById('notifBanner');
+  (!('Notification' in window) || Notification.permission !== 'granted') ? b.classList.add('show') : b.classList.remove('show');
+}
+function scheduleNotif(r) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const ms = new Date(r.target).getTime() - Date.now();
+  if (ms > 0) setTimeout(() => new Notification(`LembraMe — ${r.title}`, { body: `O prazo é hoje: ${fmtDate(r.target)}` }), ms);
+}
+function scheduleAllNotifs() { reminders.filter(r => !r.done).forEach(scheduleNotif); }
+
+checkNotifBanner();
+render();
+</script>
+</body>
+</html>
